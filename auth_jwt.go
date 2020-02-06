@@ -51,6 +51,11 @@ type GinJWTMiddleware struct {
 	// Optional, default to success.
 	Authorizator func(data interface{}, c *gin.Context) bool
 
+	// Callback function that will be called during refresh token.
+	// Using this function it is possible to add additional control on refresh.
+	// Check error (e) to determine if is refreshable.
+	RefreshFunc func(c *gin.Context) error
+
 	// Callback function that will be called during login.
 	// Using this function it is possible to add additional payload data to the webtoken.
 	// The data is then made available during requests via c.Get("JWT_PAYLOAD").
@@ -516,6 +521,12 @@ func (mw *GinJWTMiddleware) RefreshToken(c *gin.Context) (string, time.Time, err
 	claims, err := mw.CheckIfTokenExpire(c)
 	if err != nil {
 		return "", time.Now(), err
+	}
+
+	if mw.RefreshToken != nil {
+		if err := mw.RefreshToken(c); err != nil {
+			return err
+		}
 	}
 
 	// Create the token
