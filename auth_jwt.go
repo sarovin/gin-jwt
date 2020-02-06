@@ -523,9 +523,9 @@ func (mw *GinJWTMiddleware) RefreshToken(c *gin.Context) (string, time.Time, err
 		return "", time.Now(), err
 	}
 
-	if mw.RefreshToken != nil {
-		if err := mw.RefreshToken(c); err != nil {
-			return err
+	if mw.RefreshFunc != nil {
+		if err := mw.RefreshFunc(c); err != nil {
+			return "", time.Now(), err
 		}
 	}
 
