@@ -524,6 +524,8 @@ func (mw *GinJWTMiddleware) RefreshToken(c *gin.Context) (string, time.Time, err
 	}
 
 	if mw.RefreshFunc != nil {
+		c.Set("JWT_PAYLOAD", claims)
+		
 		if err := mw.RefreshFunc(c); err != nil {
 			return "", time.Now(), err
 		}
